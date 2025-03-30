@@ -1,0 +1,30 @@
+body {
+    background-color: #f8f9fa;
+  }
+  
+  h1 {
+    color: #2d3e50;
+  }
+  
+  .box {
+    background-color: #e9ecef;
+    border: 2px solid #ccc;
+    padding: 20px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 5px;
+  }
+  
+  .box:hover {
+    background-color: #dcdfe1;
+    cursor: pointer;
+  }
+  
+  #csvUpload {
+    width: 50%;
+    display: block;
+  }
+  
