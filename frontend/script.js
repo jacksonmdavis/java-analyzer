@@ -1,22 +1,40 @@
-// Select the file input and data boxes
-const csvUpload = document.getElementById('csvUpload');
-const box1 = document.getElementById('box1');
-const box2 = document.getElementById('box2');
-const box3 = document.getElementById('box3');
-const box4 = document.getElementById('box4');
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-// Handle file upload
-csvUpload.addEventListener('change', function(event) {
-  const file = event.target.files[0];
-  if (file && file.name.endsWith('.csv')) {
-    // Simulate processing and filling the boxes with random data
-    setTimeout(() => {
-      box1.textContent = "Student 1 Data";
-      box2.textContent = "Student 2 Data";
-      box3.textContent = "Student 3 Data";
-      box4.textContent = "Student 4 Data";
-    }, 1000);
-  } else {
-    alert("Please upload a valid CSV file.");
-  }
+        fetch('http://api.java-app.jacksonmdavis.com/upload', {
+            method: 'POST',
+            // credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            resultDiv.innerHTML += `<p>${data.message}</p>`;
+            resultDiv.innerHTML += `<p>${data.status}</p>`;
+            
+            if (data.results && data.results.averages) {
+                resultDiv.innerHTML += '<h3>Averages:</h3>';
+                for (const [subject, score] of Object.entries(data.results.averages)) {
+                    resultDiv.innerHTML += `<p>${subject}: ${score}</p>`;
+                }
+            }
+
+            if (data.results && data.results.image) {
+                const img = document.createElement('img');
+                img.src = `data:image/png;base64,${data.results.image}`;
+                resultDiv.appendChild(img);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('result').innerHTML = `Error: ${error.message}`;
+        });
+    }
 });

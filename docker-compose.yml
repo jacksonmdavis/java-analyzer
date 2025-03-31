@@ -1,0 +1,30 @@
+services:
+  analyzer:
+    image: jacksonmdavis/data-analyzer:latest
+    build: 
+      context: ./analyzer
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    restart: always
+
+  backend:
+    image: jacksonmdavis/data-backend:latest
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHON_SERVICE_URL=http://analyzer:5000/upload
+    depends_on:
+      - analyzer
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
