@@ -1,1 +1,1 @@
-const API_URL = 'http://localhost:8080/upload';
+const API_URL = 'http://localhost:8080';

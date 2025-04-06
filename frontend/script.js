@@ -56,8 +56,11 @@ uploadBtn.addEventListener("click", () => {
 });
 
 // Streaming Auto Upload (new)
-autoBtn.addEventListener("click", () => {
-    const file = "resources/StudentsPerformance.csv";
+autoBtn.addEventListener("click", async () => {
+    const response = await fetch('resources/StudentsPerformance.csv');
+    const blob = await response.blob();
+    const file = new File([blob], 'StudentsPerformance.csv', { type: 'text/csv' });
+
     if (!file) {
         alert("Please select a file.");
         return;
@@ -67,8 +70,12 @@ autoBtn.addEventListener("click", () => {
     statusDiv.textContent = ""; // Clear previous
     logStatus("Starting streaming upload/status...");
 
-    fetch(`${API_URL}/upload-stream?file=${encodeURIComponent(file.name)}`, {
-        method: "GET"
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch(`${API_URL}/upload-stream`, {
+        method: "POST",
+        body: formData
     })
         .then(response => {
             const reader = response.body.getReader();
@@ -92,6 +99,7 @@ autoBtn.addEventListener("click", () => {
             logStatus("Streaming failed: " + error.message);
         });
 });
+
 
 // Download CSV (stub)
 downloadBtn.addEventListener("click", () => {

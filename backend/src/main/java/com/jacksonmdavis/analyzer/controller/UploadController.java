@@ -90,7 +90,7 @@ public class UploadController {
         }
     }
 
-    @GetMapping("/upload-stream")
+    @PostMapping("/upload-stream")
     public ResponseBodyEmitter uploadWithProgress(@RequestParam("file") MultipartFile file) {
         ResponseBodyEmitter emitter = new ResponseBodyEmitter();
 

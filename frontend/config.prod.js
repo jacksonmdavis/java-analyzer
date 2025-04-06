@@ -1,1 +1,1 @@
-const API_URL = 'http://api.java-app.jacksonmdavis.com/upload';
+const API_URL = 'http://api.java-app.jacksonmdavis.com';
