@@ -8,6 +8,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import java.util.Map;
 
 /**
  * Controller handling file upload operations for student performance analysis.
@@ -96,7 +97,8 @@ public class UploadController {
 
         new Thread(() -> {
             try {
-                emitter.send("1. Uploading file to backend API...\n");
+                emitter.send(Map.of("type", "log", "message", "1. Uploading file to backend API..."), MediaType.APPLICATION_JSON);
+                emitter.send("\n", MediaType.TEXT_PLAIN);
 
                 // Prepare the file
                 MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -107,13 +109,15 @@ public class UploadController {
                     }
                 });
 
-                emitter.send("2. File received. Preparing to forward to Python service...\n");
+                emitter.send(Map.of("type", "log", "message", "2. File received. Preparing to forward to Python service..."), MediaType.APPLICATION_JSON);
+                emitter.send("\n", MediaType.TEXT_PLAIN);
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.MULTIPART_FORM_DATA);
                 HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-                emitter.send("3. Forwarding file to Python microservice...\n");
+                emitter.send(Map.of("type", "log", "message", "3. Forwarding file to Python microservice..."), MediaType.APPLICATION_JSON);
+                emitter.send("\n", MediaType.TEXT_PLAIN);
 
                 // Call Python microservice
                 ResponseEntity<String> response = restTemplate.exchange(
@@ -123,14 +127,20 @@ public class UploadController {
                         String.class
                 );
 
-                emitter.send("4. Analysis complete. Processing results...\n");
-                emitter.send(response.getBody() + "\n");
+                emitter.send(Map.of("type", "log", "message", "4. Analysis complete. Processing results..."), MediaType.APPLICATION_JSON);
+                emitter.send("\n", MediaType.TEXT_PLAIN);
 
-                emitter.send("6. Program Complete.\n");
+                emitter.send(Map.of("type", "result", "data", response.getBody()), MediaType.APPLICATION_JSON);
+                emitter.send("\n", MediaType.TEXT_PLAIN);
+
+                emitter.send(Map.of("type", "log", "message", "6. Program Complete."), MediaType.APPLICATION_JSON);
+                emitter.send("\n", MediaType.TEXT_PLAIN);
+
                 emitter.complete();
             } catch (Exception e) {
                 try {
-                    emitter.send("Error occurred: " + e.getMessage() + "\n");
+                    emitter.send(Map.of("type", "log", "message", "Error occurred: " + e.getMessage()), MediaType.APPLICATION_JSON);
+                    emitter.send("\n", MediaType.TEXT_PLAIN);
                 } catch (Exception ignored) {}
                 emitter.completeWithError(e);
             }

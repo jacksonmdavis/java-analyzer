@@ -3,19 +3,7 @@ const uploadBtn = document.getElementById("uploadBtn");
 const autoBtn = document.getElementById("autoBtn");
 const fileInput = document.getElementById("fileInput");
 const resultDiv = document.getElementById("result");
-
-// Create a status log panel
-let statusDiv = document.getElementById("status");
-if (!statusDiv) {
-    statusDiv = document.createElement("pre");
-    statusDiv.id = "status";
-    statusDiv.style.fontFamily = "monospace";
-    statusDiv.style.background = "#f9f9f9";
-    statusDiv.style.padding = "10px";
-    statusDiv.style.border = "1px solid #ccc";
-    statusDiv.style.whiteSpace = "pre-wrap";
-    document.body.insertBefore(statusDiv, resultDiv);
-}
+const statusDiv = document.getElementById("status");
 
 let startTime;
 
@@ -25,44 +13,70 @@ function logStatus(message) {
     statusDiv.textContent += `[+${elapsed}s] ${message}\n`;
 }
 
-// Manual POST Upload (existing)
-uploadBtn.addEventListener("click", () => {
-    const file = fileInput.files[0];
-    if (!file) {
-        alert("Please select a file.");
-        return;
+function displayResult(columnData, title) {
+    const container = document.createElement('div');
+    container.className = 'analysis-section mb-4';
+    
+    // Create title
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = title;
+    container.appendChild(titleElement);
+    
+    // // Create data section
+    // const dataSection = document.createElement('div');
+    // dataSection.className = 'data-section mb-2';
+    
+    // // Add data as text
+    // const dataText = document.createElement('pre');
+    // dataText.textContent = JSON.stringify(columnData.data, null, 2);
+    // dataSection.appendChild(dataText);
+    // container.appendChild(dataSection);
+    
+    // Add image if present
+    if (columnData.image) {
+        const img = document.createElement('img');
+        img.src = `data:image/png;base64,${columnData.image}`;
+        img.className = 'analysis-image img-fluid';
+        container.appendChild(img);
     }
+    
+    return container;
+}
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    startTime = Date.now();
-    statusDiv.textContent = ""; // Clear previous
-    logStatus("Uploading file to backend via POST...");
-
-    fetch(`${API_URL}/upload`, {
-        method: "POST",
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            logStatus("Upload complete. Processing results...");
-            resultDiv.textContent = JSON.stringify(data, null, 2);
-            logStatus("Done.");
-        })
-        .catch(error => {
-            logStatus("Upload failed: " + error.message);
+function showAnalysisResult(data) {
+    resultDiv.innerHTML = ''; // Clear previous results
+    console.log(data);
+    // Display overall results
+    if (data.overall) {
+        resultDiv.appendChild(displayResult(data.overall, 'Overall Averages'));
+    }
+    
+    // Display column-specific results
+    if (data.columns) {
+        data.columns.forEach(column => {
+            const columnName = Object.keys(column)[0];
+            resultDiv.appendChild(displayResult(column[columnName], columnName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')));
         });
+    }
+}
+
+uploadBtn.addEventListener("click", () => {
+    resultDiv.innerHTML = "<p class='text-muted'>Manual download/upload disabled because no one cares. Click 'Just do it Automatically!' instead.</p>";
+    return;
 });
 
-// Streaming Auto Upload (new)
+downloadBtn.addEventListener("click", () => {
+    resultDiv.innerHTML = "<p class='text-muted'>Manual download/upload disabled because no one cares. Click 'Just do it Automatically!' instead.</p>";
+    return;
+});
+
 autoBtn.addEventListener("click", async () => {
     const response = await fetch('resources/StudentsPerformance.csv');
     const blob = await response.blob();
     const file = new File([blob], 'StudentsPerformance.csv', { type: 'text/csv' });
 
     if (!file) {
-        alert("Please select a file.");
+        alert("Error: File not found.");
         return;
     }
 
@@ -77,31 +91,50 @@ autoBtn.addEventListener("click", async () => {
         method: "POST",
         body: formData
     })
-        .then(response => {
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-
-            function read() {
-                reader.read().then(({ done, value }) => {
-                    if (done) {
-                        logStatus("Stream complete.");
-                        return;
+    .then(response => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+    
+        function read() {
+            reader.read().then(({ done, value }) => {
+                if (done) {
+                    logStatus("Stream complete.");
+                    return;
+                }
+                buffer += decoder.decode(value, { stream: true });
+    
+                // Handle each complete line (newline-delimited JSON)
+                const lines = buffer.split("\n");
+                buffer = lines.pop(); // Save incomplete line
+    
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    try {
+                        const data = JSON.parse(line);
+                        if (data.type === "log") {
+                            logStatus(data.message);
+                        } else if (data.type === "result") {
+                            const outer = JSON.parse(line); // from your NDJSON line
+                            const inner = JSON.parse(outer.data); // now this is a JS object
+                            showAnalysisResult(inner.results);
+                        }
+                        else {
+                            logStatus("Unknown message type: " + data.type);
+                        }
+                    } catch (err) {
+                        // logStatus("Malformed JSON: " + line);
+                        console.log(err, line);
                     }
-                    const chunk = decoder.decode(value, { stream: true });
-                    logStatus(chunk.trim());
-                    read();
-                });
-            }
-
-            read();
-        })
-        .catch(error => {
-            logStatus("Streaming failed: " + error.message);
-        });
+                }
+                read();
+            });
+        }
+        read();
+    })
+    .catch(error => {
+        logStatus("Streaming failed: " + error.message);
+    });
 });
 
 
-// Download CSV (stub)
-downloadBtn.addEventListener("click", () => {
-    alert("Download functionality not implemented yet.");
-});

@@ -60,7 +60,7 @@ body {
 }
 
 #left-panel {
-    width: 250px;
+    width: 500px;
     background-color: #f0f0f0;
     padding: 20px;
     border-right: 1px solid #ccc;
@@ -93,15 +93,15 @@ button:hover {
     background-color: #45a049;
 }
 
-#result {
-    flex: 1;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-    overflow-y: auto;
-}
-
 /* Hide the actual file input */
 #fileInput {
     display: none;
+}
+
+#status {
+    font-family: monospace;
+    background: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
 }
