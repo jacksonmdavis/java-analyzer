@@ -13,16 +13,75 @@
         <div class="row h-100">
             <!-- Left Panel -->
             <div id="left-panel" class="col-md-4 d-flex flex-column align-items-center border-end">
-                <h2 class="mt-3">Future Features</h2>
-                <p class="text-center">This panel will contain important functionality in future updates.</p>
-                <p class="text-center">Stay tuned for exciting new features!</p>
-                <div id="status" class="col-md-9 d-flex flex-column align-items-center justify-content-center"></div>
+                <h2 class="mt-3">The "Analyzer"</h2>
+                <h5><a href="https://github.com/jacksonmdavis/java-analyzer">&lt; Source code here &gt;</a></h5>
+                <h5><a href="https://jacksonmdavis.com">Back to my portfolio</a></h5>
+                
+                <div id="status" class="col-md-9 d-flex flex-column align-items-center justify-content-center">
+                    <p>App Status:</p>
+                    <p id="status-text">Loaded, ready to begin.</p>
+                </div>
             </div>
             
             <!-- Main Content Area -->
-            <div class="col-md-6 p-0 d-flex flex-column">
+            <div id = "main-panel" class="col-md-5 p-0 d-flex flex-column">
+                <!-- Welcome Overlay -->
+                <div id="welcome-overlay" class="position-absolute top-0 start-0 w-100 h-100 bg-light d-flex flex-column justify-content-center align-items-center" style="z-index: 10;">
+                    <div class="text-center px-4">
+                        <h3>The Student Performance "Analyzer"</h3>
+
+                        <p style="width: 900px;">Welcome!  Please read the following and then click "Get Started"! <br><br>
+                            This is an "Analyzer" app.  Analyzer is in quotes because the app really doesn't do anything important.  It literally only accepts one particular CSV, does some very basic analysis, and sends back some charts.  I even disabled manual download/upload because who cares.
+                            <br>
+                            <br>
+                            The <u>actual purpose</u> of the app was for me to get experience with some new technologies, particularly Java, GraalVM, and multiple Docker containers with docker-compose, so the tech stack is complete overkill.  I made it over a weekend to prepare for a job interview, and decided to keep it because I love all my children equally.
+                            <br>
+                            <br>
+                            I also added a status bar to show the API calls and app status, to remind us all that technology is neat, and to get comfortable with streaming responses.
+                            <br>
+                            <h5><u>Tech stack</u></h5>
+                            <br>
+                            <div class="row justify-content-center">
+                                <div class="text-start col-md-3">
+                                    <strong>Frontend:</strong>
+                                    <ul>
+                                        <li>HTML</li>
+                                        <li>CSS</li>
+                                        <li>JavaScript</li>
+                                        <li>Bootstrap</li>
+                                        <li>AWS S3/CloudFront</li>
+                                    </ul>
+                                </div>
+                                <div class="text-start col-md-4">
+                                    <strong>Backend (Dockerized, Native Executable):</strong>
+                                    <ul>
+                                        <li>Java</li>
+                                        <li>Maven</li>
+                                        <li>Spring Boot API</li>
+                                        <li>GraalVM</li>
+                                        <li>NGINX</li>
+                                        <li>AWS EC2</li>
+                                    </ul>
+                                </div>
+                                <div class="text-start col-md-3">
+                                    <strong>Analytics (Dockerized):</strong>
+                                    <ul>
+                                        <li>Python</li>
+                                        <li>Pandas/Matplotlib</li>
+                                        <li>Flask API</li>
+                                        <li>AWS EC2</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                        </p>
+                        <button class="btn btn-primary" id="startAppBtn">Get Started</button><br><br>
+                        <h4><a href="https://github.com/jacksonmdavis/java-analyzer">&lt; Source code here &gt;</a></h4>
+                    </div>
+                </div>
                 <!-- Top Panel with Buttons -->
                 <div id="top-panel">
+
                     <h2 class="text-center mb-3">Student Performance Analyzer</h2>
                     <div id="button-container" class="d-flex flex-row gap-3 justify-content-center">
                         <button class="btn btn-primary" id="downloadBtn">Manually Download Data</button>
@@ -34,6 +93,7 @@
                 
                 <!-- Main Panel -->
                 <div id="main-panel" class="flex-grow-1">
+
                     <div id="result" class="w-100">
                         <!-- Analysis results will appear here -->
                     </div>

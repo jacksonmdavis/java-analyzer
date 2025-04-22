@@ -3,7 +3,7 @@ const uploadBtn = document.getElementById("uploadBtn");
 const autoBtn = document.getElementById("autoBtn");
 const fileInput = document.getElementById("fileInput");
 const resultDiv = document.getElementById("result");
-const statusDiv = document.getElementById("status");
+const statusDiv = document.getElementById("status-text");
 
 let startTime;
 
@@ -60,6 +60,16 @@ function showAnalysisResult(data) {
     }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    const startBtn = document.getElementById("startAppBtn");
+    if (startBtn) {
+        startBtn.addEventListener("click", () => {
+            document.getElementById("welcome-overlay")?.remove();
+            document.getElementById("main-panel")?.classList.add("active");
+        });
+    }
+});
+
 uploadBtn.addEventListener("click", () => {
     resultDiv.innerHTML = "<p class='text-muted'>Manual download/upload disabled because no one cares. Click 'Just do it Automatically!' instead.</p>";
     return;
@@ -115,6 +125,7 @@ autoBtn.addEventListener("click", async () => {
                         if (data.type === "log") {
                             logStatus(data.message);
                         } else if (data.type === "result") {
+                            logStatus("5. Results received. Displaying...");
                             const outer = JSON.parse(line); // from your NDJSON line
                             const inner = JSON.parse(outer.data); // now this is a JS object
                             showAnalysisResult(inner.results);

@@ -59,6 +59,12 @@ body {
     min-height: 100vh;
 }
 
+#top-panel {
+    background-color: #dfd9f8;
+    padding: 20px;
+    width: 100%;
+}
+
 #left-panel {
     width: 500px;
     background-color: #f0f0f0;
@@ -71,6 +77,8 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 #button-container {
@@ -104,4 +112,14 @@ button:hover {
     padding: 10px;
     border: 1px solid #ccc;
     white-space: pre-wrap;
+}
+
+#main-panel {
+    position: relative;
+    opacity: 1;
+}
+
+#main-panel.active {
+    pointer-events: auto;
+    opacity: 1;
 }
